@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="testRunner" value="CHOOSE_PER_TEST" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/exno1/app" />
+            <option value="$PROJECT_DIR$/exno10/app" />
+            <option value="$PROJECT_DIR$/exno2/app" />
+            <option value="$PROJECT_DIR$/exno3/app" />
+            <option value="$PROJECT_DIR$/exno4/app" />
+            <option value="$PROJECT_DIR$/exno5/app" />
+            <option value="$PROJECT_DIR$/exno6/app" />
+            <option value="$PROJECT_DIR$/exno7/app" />
+            <option value="$PROJECT_DIR$/exno8/app" />
+            <option value="$PROJECT_DIR$/exno9/app" />
+          </set>
+        </option>
+        <option name="resolveExternalAnnotations" value="true" />
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
