@@ -53,16 +53,19 @@ Each `exnoN/` folder is **also** a standalone project. You can open `exno3/` on 
 
 | Item | Version | How you get it |
 |---|---|---|
-| JDK | 17, 21 or 25 | Bundled with Android Studio (scripts auto-find it) |
+| JDK | 17 – 25 | Bundled with Android Studio. Scripts auto-find any installed JDK, or download one |
 | Gradle | 9.2.1 | Auto-downloaded by `gradlew` (wrapper) |
 | Android Gradle Plugin | 8.13.2 | Auto-downloaded |
 | Android SDK Platform | 34 (compileSdk / targetSdk) | Android Studio SDK Manager, or `setup` script, or auto-download by Gradle |
 | Min Android version | 7.0 (API 24) — exno9 needs 8.1 (API 27) | Any emulator/phone at or above this |
 
 ### What makes it "run anywhere"
-- **`gradle/sdk-autodetect.gradle.kts`** runs on every sync/build. If `local.properties` is missing, or points to a path that doesn't exist (for example `C:\Users\someone-else\...` copied from another PC), it finds the SDK automatically and rewrites the file. It searches `ANDROID_HOME`, `ANDROID_SDK_ROOT`, and the default SDK locations on Windows, macOS and Linux.
+- **`gradle/sdk-autodetect.gradle.kts`** runs on every sync/build. If `local.properties` is missing, or points to a path that doesn't exist (for example `C:\Users\someone-else\...` copied from another PC), it finds the SDK automatically and rewrites the file. It searches `ANDROID_HOME`, `ANDROID_SDK_ROOT`, **the SDK path Android Studio itself saved**, the Windows registry, and the default SDK folders on Windows, macOS and Linux (including `D:\Android\Sdk` and Homebrew).
 - **Gradle wrapper** is committed, so there's no need to install Gradle.
-- **`setup.sh` / `setup.bat`** find Java (falling back to Android Studio's bundled JBR), find the SDK, accept SDK licenses, install `platforms;android-34` / build-tools if missing, then build everything.
+- **Java finder (built into `setup.bat` / `setup.sh`, also used by `run_app`)** finds a JDK that Gradle can run on (Java 17–25). It checks, in order:
+  `JAVA_HOME` (a trailing `\` or quotes are fixed automatically) → `java` on PATH → Android Studio's bundled JDK (normal install, JetBrains Toolbox, snap/flatpak) → Windows registry (Oracle, Temurin, Microsoft, Zulu, Corretto, Liberica, Semeru) → common JDK folders, `~/.jdks`, Gradle/IntelliJ downloads, scoop, SDKMAN, Homebrew, `/usr/lib/jvm`.
+  Unsupported versions (e.g. Java 8 or 11) are skipped with a message. If nothing usable exists, `setup` offers to **download a portable JDK 21** (Eclipse Temurin) into `~/.jdks`; no admin rights needed.
+- **`setup.sh` / `setup.bat`** find Java, find the SDK, accept SDK licenses, install `platforms;android-34` / build-tools if missing, then build everything. `run_app` uses the same Java finder.
 - **`local.properties` is git-ignored**, because it is machine-specific.
 - **`.gitattributes`** keeps `.bat` files with CRLF line endings and `gradlew`/`.sh` with LF, so the scripts work after cloning on any OS.
 
@@ -86,7 +89,8 @@ Permissions the apps ask for at runtime — tap **Allow**:
 | Error | Fix |
 |---|---|
 | `SDK location not found` | Run `setup.sh` / `setup.bat`, or set `ANDROID_HOME`, or create `local.properties` with `sdk.dir=/path/to/Android/Sdk` (Windows: `sdk.dir=C:/Users/YOU/AppData/Local/Android/Sdk`). |
-| `Unsupported class file major version` / build fails right away with only a Java version number (e.g. `25.0.1`) | Gradle is running on the wrong Java. In Android Studio: **Settings → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK** → choose *jbr-21* / *Embedded JDK* (17+). CLI: set `JAVA_HOME` to a JDK 17–25. |
+| `Unsupported class file major version` / build fails right away with only a Java version number (e.g. `25.0.1`) | Gradle is running on the wrong Java. In Android Studio: **Settings → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK** → choose *Embedded JDK (jbr)*. CLI: run `setup.bat` / `./setup.sh`, which finds a JDK 17–25 or downloads one. |
+| `JAVA_HOME is set to an invalid directory` / `'C:\Program' is not recognized` | Usually `JAVA_HOME` has a trailing `\`, quotes, or points to an old Java. Run `setup.bat --check`: it ignores a bad `JAVA_HOME` and shows which Java it picked. To fix it permanently, set `JAVA_HOME` to a folder like `C:\Program Files\Android\Android Studio\jbr` (no trailing `\`, no quotes). |
 | `The project is using an incompatible version (AGP 8.13.2)` | Your Android Studio is too old → update to Narwhal 2025.1.3+. |
 | `Failed to install the following SDK components ... licences not accepted` | `setup.sh`/`setup.bat` accepts them, or Android Studio → SDK Manager → install *Android 14 (API 34)*. |
 | `./gradlew: Permission denied` | `chmod +x gradlew` (the setup script does this). |
@@ -108,7 +112,7 @@ Android Studio Projects/
 │   ├── sdk-autodetect.gradle.kts
 │   └── wrapper/                # Gradle 9.2.1 wrapper
 ├── gradlew / gradlew.bat
-├── setup.sh / setup.bat        # environment doctor + build all
+├── setup.sh / setup.bat        # environment doctor: finds/downloads Java, finds SDK, builds all
 ├── run_app.sh / run_app.bat    # build + install + launch one app
 ├── .idea/runConfigurations/    # ready-made Run configs exno1 … exno10
 └── exno1 … exno10/

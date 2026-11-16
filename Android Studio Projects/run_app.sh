@@ -4,14 +4,8 @@ set -e
 cd "$(dirname "$0")"
 chmod +x gradlew 2>/dev/null || true
 
-# Gradle 9 needs JDK 17+. If system java is missing/too old, fall back to Android Studio's bundled JBR.
-java_major() { "$1" -version 2>&1 | head -1 | sed -E 's/.*version "([0-9]+).*/\1/'; }
-if [ -z "$JAVA_HOME" ] && { ! command -v java >/dev/null || [ "$(java_major java)" -lt 17 ] 2>/dev/null; }; then
-  for j in "$HOME"/Apps/AndroidStudio/jbr /opt/android-studio/jbr "$HOME"/android-studio/jbr \
-           /snap/android-studio/current/jbr "/Applications/Android Studio.app/Contents/jbr/Contents/Home"; do
-    [ -x "$j/bin/java" ] && export JAVA_HOME="$j" && echo "[*] Using JDK: $j" && break
-  done
-fi
+# Find a JDK 17-25 (same finder as setup.sh: JAVA_HOME, PATH, Android Studio's JDK, installed JDKs)
+source ./setup.sh --find-java || { echo "[ERROR] No usable Java. Run ./setup.sh (it can download one)."; exit 1; }
 
 CHOICE="${1:-}"
 if [ -z "$CHOICE" ]; then
