@@ -34,13 +34,15 @@ public class MainActivity extends ListActivity {
             headlines = new ArrayList<>();
             links = new ArrayList<>();
             try {
-                URL url = new URL("https://codingconnect.net/feed");
+                URL url = new URL("https://feeds.bbci.co.uk/news/technology/rss.xml") /* old feed codingconnect.net is dead */;
                 XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
                 factory.setNamespaceAware(false);
                 XmlPullParser xpp = factory.newPullParser();
 
                 // We will get the XML from an input stream
-                xpp.setInput(getInputStream(url), "UTF_8");
+                InputStream in = getInputStream(url);
+                if (in == null) throw new IOException("Could not download feed (no internet?)");
+                xpp.setInput(in, "UTF-8");
                 boolean insideItem = false;
 
                 // Returns the type of current event: START_TAG, END_TAG, etc..
@@ -66,7 +68,7 @@ public class MainActivity extends ListActivity {
                 e.printStackTrace();
             } catch (XmlPullParserException e) {
                 e.printStackTrace();
-            } catch (IOException e) {
+            } catch (IOException | RuntimeException e) {
                 e.printStackTrace();
             }
             return null;
@@ -76,11 +78,15 @@ public class MainActivity extends ListActivity {
         protected void onPostExecute(ArrayAdapter<String> adapter) {
             adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, headlines);
             setListAdapter(adapter);
+            if (headlines.isEmpty()) {
+                android.widget.Toast.makeText(MainActivity.this, "Could not load news feed. Check internet connection.", android.widget.Toast.LENGTH_LONG).show();
+            }
         }
     }
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
+        if (position >= links.size()) return;
         Uri uri = Uri.parse(links.get(position));
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);

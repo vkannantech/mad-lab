@@ -31,17 +31,31 @@ public class MainActivity extends AppCompatActivity {
         // Check for location permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Request permission if not already granted
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
             return;
         }
 
-        // Initialize Location Manager and Listener
-        LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        LocationListener mlocListener = new MyLocationListener();
+        startLocationUpdates();
+    }
 
-        // Request location updates from GPS
-        if (mlocManager != null) {
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
+    // Uses GPS + network (Wi-Fi/cell) location, and shows the last known fix immediately.
+    // GPS alone often gets no fix indoors (e.g. in a lab).
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (mlocManager == null) return;
+        if (!mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            Toast.makeText(this, "Turn ON Location in phone settings", Toast.LENGTH_LONG).show();
+        }
+        LocationListener mlocListener = new MyLocationListener();
+        for (String provider : new String[]{LocationManager.NETWORK_PROVIDER, LocationManager.GPS_PROVIDER}) {
+            if (!mlocManager.getAllProviders().contains(provider)) continue;
+            Location last = mlocManager.getLastKnownLocation(provider);
+            if (last != null) mlocListener.onLocationChanged(last);
+            mlocManager.requestLocationUpdates(provider, 0, 0, mlocListener);
         }
     }
 
@@ -49,14 +63,10 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission was granted, re-request location updates
-                LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                LocationListener mlocListener = new MyLocationListener();
-
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
-                }
+            boolean anyGranted = false;
+            for (int r : grantResults) if (r == PackageManager.PERMISSION_GRANTED) anyGranted = true;
+            if (anyGranted) { // fine OR approximate location
+                startLocationUpdates();
             } else {
                 // Permission denied, show a message to the user
                 Toast.makeText(this, "Location permission is required for this app", Toast.LENGTH_SHORT).show();
