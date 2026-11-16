@@ -16,3 +16,7 @@ build/
 /captures
 .externalNativeBuild
 .cxx
+**/.idea/deploymentTargetSelector.xml
+**/.idea/workspace.xml
+**/.idea/caches/
+**/local.properties

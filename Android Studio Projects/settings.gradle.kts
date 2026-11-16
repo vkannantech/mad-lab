@@ -1,3 +1,5 @@
+apply(from = "gradle/sdk-autodetect.gradle.kts")
+
 pluginManagement {
     repositories {
         google {
