@@ -47,6 +47,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendNotification() {
+        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            android.widget.Toast.makeText(this, "Allow notification permission first", android.widget.Toast.LENGTH_SHORT).show();
+            requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
+            return;
+        }
         String message = messageInput.getText().toString();
         Intent intent = new Intent(this, Main2Activity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
