@@ -117,7 +117,7 @@ if [ "$1" = "--find-java" ]; then find_java; return $? 2>/dev/null || exit $?; f
 
 # ============================ Setup =========================================
 cd "$(dirname "$0")"
-chmod +x gradlew run_app.sh exno*/gradlew 2>/dev/null
+chmod +x gradlew run_app.sh exno*/gradlew up_ex*/gradlew 2>/dev/null
 ok()   { echo "  [OK]   $*"; }
 warn() { echo "  [WARN] $*"; }
 fail() { echo "  [FAIL] $*"; FAILED=1; }
@@ -186,6 +186,6 @@ else warn "No device/emulator connected (only needed for run_app.sh / Run button
 # ---------- 5. Build everything ----------
 echo; echo "=== Building all 10 apps (first run downloads Gradle + libraries, needs internet) ==="
 ./gradlew assembleDebug && {
-  echo; echo "SUCCESS. APKs: exnoN/app/build/outputs/apk/debug/"
+  echo; echo "SUCCESS. APKs: exnoN/app and up_exN/app/build/outputs/apk/debug/"
   echo "Install + launch one with:  ./run_app.sh 3"
 }

@@ -52,3 +52,27 @@ project(":exno9").projectDir = file("exno9/app")
 
 include(":exno10")
 project(":exno10").projectDir = file("exno10/app")
+
+include(":up_ex3")
+project(":up_ex3").projectDir = file("up_ex3/app")
+
+include(":up_ex4")
+project(":up_ex4").projectDir = file("up_ex4/app")
+
+include(":up_ex5")
+project(":up_ex5").projectDir = file("up_ex5/app")
+
+include(":up_ex6")
+project(":up_ex6").projectDir = file("up_ex6/app")
+
+include(":up_ex7")
+project(":up_ex7").projectDir = file("up_ex7/app")
+
+include(":up_ex8")
+project(":up_ex8").projectDir = file("up_ex8/app")
+
+include(":up_ex9")
+project(":up_ex9").projectDir = file("up_ex9/app")
+
+include(":up_ex10")
+project(":up_ex10").projectDir = file("up_ex10/app")

@@ -1,5 +1,5 @@
 @echo off
-rem Android Dev Portfolio - App Runner (Windows). Usage: run_app.bat [1-10 | exnoN]
+rem Android Dev Portfolio - App Runner (Windows). Usage: run_app.bat [u3-u10 | up_exN | 1-10 | exnoN]
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
@@ -20,6 +20,16 @@ set "CHOICE=%~1"
 if "%CHOICE%"=="" (
     echo.
     echo Select an exercise app to build and install:
+    echo  Updated manual (up_ex):
+    echo   [u3] up_ex3  - Visiting Card
+    echo   [u4] up_ex4  - Graphical Primitives
+    echo   [u5] up_ex5  - SQLite Student Database
+    echo   [u6] up_ex6  - Notification Manager
+    echo   [u7] up_ex7  - Multithreading - Load Images
+    echo   [u8] up_ex8  - Wallpaper Changer
+    echo   [u9] up_ex9  - Write/Read SD Card
+    echo  [u10] up_ex10 - Send an Email
+    echo  Old versions (exno):
     echo   [1] exno1  - GUI Components - Font size and Color
     echo   [2] exno2  - Layouts, Spinner and Intent
     echo   [3] exno3  - Graphical Primitives - Canvas
@@ -31,7 +41,7 @@ if "%CHOICE%"=="" (
     echo   [9] exno9  - Notifications + Fragments
     echo  [10] exno10 - RSS News Feed - AsyncTask
     echo.
-    set /p "CHOICE=Enter exercise number (1-10) or name (e.g. exno3): "
+    set /p "CHOICE=Enter choice (u3-u10 or 1-10): "
 )
 
 if not defined CHOICE (
@@ -41,9 +51,10 @@ if not defined CHOICE (
 )
 rem Normalize: "3" -> "exno3"
 set "CHOICE=%CHOICE: =%"
+echo %CHOICE%| findstr /r /i "^u[0-9][0-9]*$" >nul && set "CHOICE=up_ex%CHOICE:~1%"
 echo %CHOICE%| findstr /r "^[0-9][0-9]*$" >nul && set "CHOICE=exno%CHOICE%"
 if not exist "%CHOICE%\app\build.gradle.kts" (
-    echo [ERROR] Unknown app "%CHOICE%". Use 1-10 or exno1-exno10.
+    echo [ERROR] Unknown app "%CHOICE%". Use u3-u10 or 1-10.
     pause
     exit /b 1
 )
